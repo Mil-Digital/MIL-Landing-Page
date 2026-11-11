@@ -14,6 +14,15 @@ const root = join(__dirname, "..");
 let original = readFileSync(join(root, "scripts/.original-body.html"), "utf8");
 let rendered = renderPage(resolveContent(null)).split("<body>")[1].split("</body>")[0];
 
+// --- analytics hooks (invisible): data-analytics-* attributes and the deferred tracker tag ---
+if (!/data-analytics-id="hero\.cta"/.test(rendered) || !/<script defer src="\/mil-analytics\.js/.test(rendered)) {
+  console.error("❌ Analytics hooks missing from the rendered page");
+  process.exit(1);
+}
+rendered = rendered
+  .replace(/\s*<script defer src="\/mil-analytics\.js[^>]*><\/script>/, "")
+  .replace(/\sdata-analytics-(id|label|kind|section|video)="[^"]*"/g, "");
+
 // --- intentional changes, removed from the ORIGINAL side ---
 original = original
   .replace(/\s*<div class="lp-stack">[\s\S]*?<\/div>/, "") // hidden at all breakpoints

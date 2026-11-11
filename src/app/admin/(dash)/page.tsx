@@ -51,7 +51,7 @@ export default function Overview() {
         </div>
       </div>
 
-      <div className="grid grid-3 mt-16">
+      <div className="grid grid-2 mt-16">
         <Link href="/admin/content/hero" className="card shortcut">
           <span className="ic"><Icon name="edit" /></span>
           <span><b>Content Editor</b><span>Edit teks & konten per section</span></span>
@@ -63,6 +63,10 @@ export default function Overview() {
         <Link href="/admin/content/settings" className="card shortcut">
           <span className="ic"><Icon name="settings" /></span>
           <span><b>Settings</b><span>SEO, gambar share & WhatsApp</span></span>
+        </Link>
+        <Link href="/admin/analytics" className="card shortcut">
+          <span className="ic"><Icon name="stats" /></span>
+          <span><b>Analytics</b><span>Traffic, klik, heatmap & performa video</span></span>
         </Link>
       </div>
 

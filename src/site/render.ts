@@ -18,6 +18,8 @@ import { HEAD_STYLES, FRAMEWORK_STYLE } from "./generated/styles";
 import { CARD_ICONS, MISC_ICONS, TAG_ICONS, WORKFLOW_ICONS } from "./generated/icons";
 import { FRAMEWORK_SCRIPT, TESTIMONIAL_VIDEO_SCRIPT, WA_FLOAT_SCRIPT, WORKFLOW_CYCLE_SVG } from "./generated/scripts";
 import { EXTENSION_STYLES } from "./extensions";
+import { createHash } from "node:crypto";
+import { ANALYTICS, TRACKER_VERSION } from "@/lib/analytics/config";
 
 type Any = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
 
@@ -28,7 +30,22 @@ export type RenderOptions = {
   preview?: boolean;
   /** Content came from the built-in fallback (database unreachable). Rendered as an HTML comment only. */
   fallback?: boolean;
+  /** Include the first-party analytics tracker (default: on for the public page, off in previews). */
+  analytics?: boolean;
 };
+
+/* ---------------- analytics hooks (invisible attributes) ---------------- */
+const slug = (v: unknown, fallback: string) =>
+  String(v ?? "").normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40) || fallback;
+/** data-analytics-* attributes: a stable id (survives restyling / DOM changes) + a readable label. */
+const ax = (id: string, label: string, kind?: string) =>
+  ` data-analytics-id="${esc(id)}" data-analytics-label="${esc(label)}"${kind ? ` data-analytics-kind="${kind}"` : ""}`;
+const sec = (id: string) => ` data-analytics-section="${id}"`;
+
+/** Layout version = template version + hash of the published content. Heatmaps can be limited to one layout. */
+export const TEMPLATE_VERSION = "t1";
+export const layoutVersion = (c: SiteContent) =>
+  `${TEMPLATE_VERSION}-${createHash("sha1").update(JSON.stringify(c)).digest("hex").slice(0, 10)}`;
 
 const img = (v: ImageValue | undefined, attrs: { cls?: string; alt?: string; lazy?: boolean; style?: string; priority?: boolean } = {}) => {
   const url = safeUrl(v?.url);
@@ -132,11 +149,11 @@ export function renderPage(c: SiteContent, opts: RenderOptions = {}): string {
   const line2 = String(hero.headlineLine2 ?? "").trim();
   const heroHtml = `
 <!-- ================= HERO ================= -->
-<header class="hero hv2">
+<header class="hero hv2"${sec("hero")}>
   <div class="hv2-bg" aria-hidden="true">${img(hero.background, { alt: "", priority: true })}</div>
   <div class="wrap hv2-inner">
     <nav class="nav">
-      <a href="#">${img(hero.logo)}</a>
+      <a href="#"${ax("hero.logo", "Hero — Logo", "nav")}>${img(hero.logo)}</a>
       ${hero.tagline ? `<span class="tag">${esc(hero.tagline)}</span>` : ""}
     </nav>
     <div class="hv2-copy">
@@ -149,7 +166,7 @@ ${stats}
         </ul>
       </div>` : ""}
       <div class="hv2-cta">
-        <a ${ctaAttrs(hero.ctaUrl, set)} class="btn"><span>${inline(hero.ctaText)}</span> <span>→</span></a>
+        <a ${ctaAttrs(hero.ctaUrl, set)} class="btn"${ax("hero.cta", `Hero — ${plain(hero.ctaText)} (CTA)`, "cta")}><span>${inline(hero.ctaText)}</span> <span>→</span></a>
         ${String(hero.ctaNote ?? "").trim() ? `<span class="hv2-note">${inline(hero.ctaNote)}</span>` : ""}
       </div>
     </div>
@@ -160,13 +177,13 @@ ${stats}
   const bc = String(clients.brandCount ?? "").trim();
   const clientsHtml = `
 <!-- ================= CLIENTS ================= -->
-<section class="sec clients">
+<section class="sec clients"${sec("clients")}>
   <div class="wrap">
     <div class="head">
       <h2 class="display">${bc ? `<b>${esc(bc)}</b> ` : ""}${inline(clients.headline)}</h2>
       <p style="text-wrap:balance">${inline(clients.description)}</p>
     </div>
-    <div class="logo-panel">
+    <div class="logo-panel"${ax("clients.logo-wall", "Brand Statistics — Logo klien", "logos")}>
       ${img(clients.logoWallDesktop, { cls: "lp-full", lazy: true })}
       ${img(clients.logoWallMobile, { cls: "lp-m", lazy: true })}
     </div>
@@ -177,7 +194,7 @@ ${stats}
   const stages: Any[] = (wf.stages ?? []).slice(0, 3);
   while (stages.length < 3) stages.push({ title: "", items: [] });
   const nodes = stages
-    .map((st, i) => `          <button type="button" class="mw-node${i === 0 ? " on" : ""}" role="tab" aria-selected="${i === 0}" aria-controls="mw-p${i}" id="mw-t${i}" data-i="${i}"${i ? ` tabindex="-1"` : ""}><span class="n">${WORKFLOW_ICONS[i]}<i class="b">${i + 1}</i></span><span class="t">${esc(st.title)}</span></button>`)
+    .map((st, i) => `          <button type="button" class="mw-node${i === 0 ? " on" : ""}" role="tab" aria-selected="${i === 0}" aria-controls="mw-p${i}" id="mw-t${i}" data-i="${i}"${i ? ` tabindex="-1"` : ""}${ax(`workflow.stage-${i + 1}`, `Workflow — ${plain(st.title) || `Tahap ${i + 1}`}`, "tab")}><span class="n">${WORKFLOW_ICONS[i]}<i class="b">${i + 1}</i></span><span class="t">${esc(st.title)}</span></button>`)
     .join("\n");
   const panes = stages
     .map((st, i) => {
@@ -192,7 +209,7 @@ ${stats}
     .join("\n");
   const workflowHtml = `
 <!-- ================= MIL DIGITAL FRAMEWORK ================= -->
-<section class="sec fw" id="framework">
+<section class="sec fw" id="framework"${sec("workflow")}>
   <style>${FRAMEWORK_STYLE}</style>
   <div class="wrap">
     <div class="head">
@@ -219,7 +236,7 @@ ${panes}
 
   /* ---------------- SERVICES ---------------- */
   const core = (sv.core ?? [])
-    .map((s: Any, i: number) => `        <div class="c-card">
+    .map((s: Any, i: number) => `        <div class="c-card"${ax(`services.core-${slug(s.title, String(i + 1))}`, `Services — ${plain(s.title)}`, "card")}>
           <div class="ico">${cardIcon(s.icon)}</div>
           <span class="num">${String(i + 1).padStart(2, "0")}</span>
           <h3>${esc(s.title)}</h3>
@@ -229,11 +246,11 @@ ${panes}
         </div>`)
     .join("\n");
   const addCards = (add.items ?? [])
-    .map((s: Any) => `          <div class="a-card">${cardIcon(s.icon)}<b>${esc(s.title)}</b><span class="a-desc">${esc(s.description)}</span>${tags(s.tags, "plat ur-plat")}${clientLogos(s)}</div>`)
+    .map((s: Any, i: number) => `          <div class="a-card"${ax(`services.additional-${slug(s.title, String(i + 1))}`, `Additional Services — ${plain(s.title)}`, "card")}>${cardIcon(s.icon)}<b>${esc(s.title)}</b><span class="a-desc">${esc(s.description)}</span>${tags(s.tags, "plat ur-plat")}${clientLogos(s)}</div>`)
     .join("\n");
   const servicesHtml = `
 <!-- ================= SERVICES ================= -->
-<section class="sec">
+<section class="sec"${sec("services")}>
   <div class="wrap">
     <div class="services">
       ${sv.eyebrow ? `<span class="eyebrow">${esc(sv.eyebrow)}</span>` : ""}
@@ -257,18 +274,18 @@ ${addCards}
 
   /* ---------------- TESTIMONIALS ---------------- */
   const cards = (testi.items ?? [])
-    .map((t: Any) => {
+    .map((t: Any, i: number) => {
       const v = t.video as VideoValue | undefined;
       if (t.kind !== "video" || !safeUrl(v?.url)) {
         return `      <div class="t-card">${MISC_ICONS.placeholder}${esc(t.caption)}</div>`;
       }
       const poster = safeUrl((t.poster as ImageValue | undefined)?.url);
-      return `      <div class="t-card t-video"><div class="tv-cap">${esc(t.caption)}</div><div class="tv-frame"><button type="button" class="tv-play" aria-label="${esc(testi.playLabel)}">${MISC_ICONS.play}${MISC_ICONS.replay}</button><video src="${esc(safeUrl(v!.url))}" playsinline preload="none" controlslist="nodownload" disablepictureinpicture${poster ? ` poster="${esc(poster)}"` : ""} aria-label="${esc(t.ariaLabel || t.caption)}">${esc(testi.unsupportedText)}</video></div></div>`;
+      return `      <div class="t-card t-video"><div class="tv-cap">${esc(t.caption)}</div><div class="tv-frame" data-analytics-video="testimonial-${i + 1}"><button type="button" class="tv-play" aria-label="${esc(testi.playLabel)}"${ax(`testimonials.play-${i + 1}`, `Testimonial — ${plain(t.caption) || `Video ${i + 1}`} (Play)`, "video")}>${MISC_ICONS.play}${MISC_ICONS.replay}</button><video src="${esc(safeUrl(v!.url))}" playsinline preload="none" controlslist="nodownload" disablepictureinpicture${poster ? ` poster="${esc(poster)}"` : ""} aria-label="${esc(t.ariaLabel || t.caption)}">${esc(testi.unsupportedText)}</video></div></div>`;
     })
     .join("\n");
   const testiHtml = `
 <!-- ================= TESTIMONIALS ================= -->
-<section class="sec testi">
+<section class="sec testi"${sec("testimonials")}>
   <div class="wrap">
     <div class="head"><h2 class="display">${inline(testi.headline)}</h2></div>
     <div class="testi-grid">
@@ -284,14 +301,14 @@ ${cards}
     .join(" ");
   const ctaHtml = `
 <!-- ================= CTA ================= -->
-<section class="cta">
+<section class="cta"${sec("cta")}>
   <div class="wrap">
     <div class="cta-card">
       <div>
         ${cta.eyebrow ? `<span class="eyebrow">${esc(cta.eyebrow)}</span>` : ""}
         <h2 class="display">${ctaLines}</h2>
         <p class="lead">${inline(cta.description)}</p>
-        <a ${ctaAttrs(cta.ctaUrl, set)} class="btn cyan"><span>${inline(cta.ctaText)}</span> <span>→</span></a>
+        <a ${ctaAttrs(cta.ctaUrl, set)} class="btn cyan"${ax("cta.button", `Closing CTA — ${plain(cta.ctaText)}`, "cta")}><span>${inline(cta.ctaText)}</span> <span>→</span></a>
       </div>
       <div class="photo has-img" style="aspect-ratio:4/3">${img(cta.image, { style: "object-position:50% 50%", lazy: true })}</div>
     </div>
@@ -303,16 +320,16 @@ ${cards}
   const copyright = String(foot.copyright ?? "").replace(/\{brand\}/g, String(foot.brandName ?? "")).replace(/\{year\}/g, year);
   const socials = (foot.socials ?? []).filter((s: Any) => safeUrl(s?.url) && String(s?.label ?? "").trim());
   const contact: string[] = [];
-  if (String(foot.email ?? "").trim()) contact.push(`<a href="mailto:${esc(String(foot.email).trim())}">${esc(foot.email)}</a>`);
-  if (String(foot.phone ?? "").trim()) contact.push(`<a href="tel:${esc(String(foot.phone).replace(/[^\d+]/g, ""))}">${esc(foot.phone)}</a>`);
+  if (String(foot.email ?? "").trim()) contact.push(`<a href="mailto:${esc(String(foot.email).trim())}"${ax("footer.email", "Footer — Email", "contact")}>${esc(foot.email)}</a>`);
+  if (String(foot.phone ?? "").trim()) contact.push(`<a href="tel:${esc(String(foot.phone).replace(/[^\d+]/g, ""))}"${ax("footer.phone", "Footer — Telepon", "contact")}>${esc(foot.phone)}</a>`);
   if (String(foot.address ?? "").trim()) contact.push(`<span>${esc(foot.address).replace(/\r?\n/g, "<br>")}</span>`);
   const meta = contact.length || socials.length
     ? `
-    <div class="foot-meta">${contact.length ? `<div class="foot-contact">${contact.join("")}</div>` : ""}${socials.length ? `<ul class="foot-social">${socials.map((s: Any) => `<li><a href="${esc(safeUrl(s.url))}" target="_blank" rel="noopener">${esc(s.label)}</a></li>`).join("")}</ul>` : ""}</div>`
+    <div class="foot-meta">${contact.length ? `<div class="foot-contact">${contact.join("")}</div>` : ""}${socials.length ? `<ul class="foot-social">${socials.map((s: Any) => `<li><a href="${esc(safeUrl(s.url))}" target="_blank" rel="noopener"${ax(`footer.social-${slug(s.label, "link")}`, `Footer — ${plain(s.label)}`, "social")}>${esc(s.label)}</a></li>`).join("")}</ul>` : ""}</div>`
     : "";
   const footerHtml = `
 <!-- ================= FOOTER ================= -->
-<footer>
+<footer${sec("footer")}>
   <div class="wrap">
     <div class="big">${inline(foot.bigText, "i", true)}</div>${String(foot.tagline ?? "").trim() ? `
     <p class="foot-line">${esc(foot.tagline)}</p>` : ""}${meta}
@@ -328,11 +345,16 @@ ${cards}
     .replace(/"Putar ulang video testimoni"/g, jsLiteral(testi.replayLabel))
     .replace(/"Putar video testimoni"/g, jsLiteral(testi.playLabel));
 
+  const withAnalytics = (opts.analytics ?? !opts.preview) && ANALYTICS.enabled;
+  const tracker = withAnalytics
+    ? `\n<script defer src="/mil-analytics.js?v=${TRACKER_VERSION}" data-mil-analytics data-consent="${ANALYTICS.consentMode}" data-layout="${layoutVersion(c)}"></script>`
+    : "";
+
   const tail = `
 
-<a href="${esc(waLink(set))}" data-wa target="_blank" rel="noopener" class="wa-float" aria-label="${esc(set.waFloatLabel)}">${MISC_ICONS.whatsapp}</a>
+<a href="${esc(waLink(set))}" data-wa target="_blank" rel="noopener" class="wa-float" aria-label="${esc(set.waFloatLabel)}"${ax("whatsapp.float", "WhatsApp — tombol melayang", "whatsapp")}>${MISC_ICONS.whatsapp}</a>
 <script>${WA_FLOAT_SCRIPT}</script>
-<script id="tv-js">${tvScript}</script>${opts.preview ? `
+<script id="tv-js">${tvScript}</script>${tracker}${opts.preview ? `
 <div style="position:fixed;left:16px;bottom:16px;z-index:9999;font:600 12px/1 system-ui,sans-serif;background:#111827;color:#fff;padding:9px 12px;border-radius:999px;box-shadow:0 6px 20px rgba(0,0,0,.25);letter-spacing:.02em">● PREVIEW — konten draft, belum dipublikasikan</div>` : ""}`;
 
   return `${head}\n\n<body>\n${heroHtml}\n${clientsHtml}\n${workflowHtml}\n${servicesHtml}\n${testiHtml}\n${ctaHtml}\n${footerHtml}${tail}</body>\n</html>\n`;

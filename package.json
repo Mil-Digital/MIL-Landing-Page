@@ -12,7 +12,8 @@
     "admin:create": "tsx --env-file=.env.local scripts/create-admin.ts",
     "extract": "python3 scripts/extract_original.py",
     "admin:password": "tsx --env-file=.env.local scripts/create-admin.ts --reset",
-    "storage:cors": "tsx --env-file=.env.local scripts/setup-storage.ts"
+    "storage:cors": "tsx --env-file=.env.local scripts/setup-storage.ts",
+    "test:analytics": "tsx scripts/analytics-test.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1166.0",
