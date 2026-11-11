@@ -17,6 +17,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1166.0",
     "@aws-sdk/s3-request-presigner": "^3.1166.0",
+    "@vercel/analytics": "^2.0.1",
     "better-auth": "^1.7.20",
     "next": "^16.4.6",
     "pg": "^8.23.1",
