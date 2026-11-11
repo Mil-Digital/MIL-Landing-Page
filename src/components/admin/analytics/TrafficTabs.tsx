@@ -47,7 +47,7 @@ function TrafficChart({ series, granularity }: { series: Series; granularity: st
 function NoData({ last }: { last?: string | null }) {
   return (
     <EmptyState title="Belum ada data untuk filter ini">
-      Data muncul setelah pengunjung membuka website dan (pada mode opt-in) menyetujui analytics.
+      Data muncul setelah ada pengunjung yang membuka website.
       {last === null ? " Coba perbesar rentang tanggal atau hapus filter device/sumber." : ""}
     </EmptyState>
   );

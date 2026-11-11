@@ -44,7 +44,7 @@ export function PrivacyTab({ meta }: { meta: Meta | null }) {
   const consentText: Record<string, string> = {
     "opt-in": "Opt-in — tidak ada data yang direkam sebelum pengunjung menekan “Izinkan” pada banner.",
     notice: "Notice — analytics berjalan, banner memberi tahu pengunjung dan menyediakan tombol “Tolak”.",
-    none: "Tanpa banner — hanya gunakan jika persetujuan sudah dikelola alat lain.",
+    none: "Tanpa banner — analytics anonim langsung berjalan untuk semua pengunjung (kecuali Do Not Track).",
   };
 
   return (
@@ -52,7 +52,7 @@ export function PrivacyTab({ meta }: { meta: Meta | null }) {
       <Panel title="Status & privasi">
         <dl className="kv">
           <dt>Tracking</dt><dd>{meta?.enabled ? <span className="badge green">Aktif</span> : <span className="badge red">Nonaktif (ANALYTICS_ENABLED)</span>}</dd>
-          <dt>Mode persetujuan</dt><dd className="wrap-dd">{consentText[meta?.consentMode ?? "opt-in"]}</dd>
+          <dt>Mode persetujuan</dt><dd className="wrap-dd">{consentText[meta?.consentMode ?? "none"]}</dd>
           <dt>Do Not Track / GPC</dt><dd>Selalu dihormati (tidak direkam)</dd>
           <dt>Zona waktu laporan</dt><dd>{meta?.timezone}</dd>
           <dt>Session timeout</dt><dd>{meta?.sessionTimeoutMin} menit tanpa aktivitas</dd>
