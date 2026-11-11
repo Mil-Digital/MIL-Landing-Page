@@ -1,0 +1,12 @@
+-- =====================================================================
+--  LANGKAH 1 — jalankan SEKALI di Neon SQL Editor (sebagai neondb_owner)
+--
+--  Membuat role database khusus aplikasi. Role ini SENGAJA dibuat lewat SQL
+--  (bukan Console): role dari Console otomatis mendapat neon_superuser yang
+--  memiliki BYPASSRLS, sehingga Row Level Security tidak akan berlaku.
+--
+--  Ganti password di bawah dengan password acak yang kuat
+--  (min. 16 karakter, huruf besar/kecil + angka; hindari simbol agar mudah
+--  dipakai di connection string). Contoh membuat: openssl rand -hex 20
+-- =====================================================================
+create role cms_app with login password 'GANTI_DENGAN_PASSWORD_KUAT';
