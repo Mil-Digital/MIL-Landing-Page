@@ -15,7 +15,7 @@ data disimpan di database Neon yang sama, login memakai Better Auth yang sama, d
 ```
 Pengunjung ──► /  (HTML original + atribut data-analytics-* + <script defer src="/mil-analytics.js">)
                  │  tracker (±9 KB, tanpa dependency, tanpa cookie)
-                 │  · consent banner (opt-in default) · DNT/GPC dihormati
+                 │  · tanpa banner (default `none`) · DNT/GPC dihormati
                  │  · batching: kirim tiap 10 dtk / 40 event / saat tab ditutup (sendBeacon)
                  ▼
          POST /api/collect   (publik, anonim)
@@ -77,7 +77,7 @@ Jalankan **`db/migrations/002_analytics.sql`** (setelah `001_schema.sql`). Aman 
 | Variable | Wajib | Default | Keterangan |
 |---|:-:|---|---|
 | `CRON_SECRET` | ✅ | — | String acak (`openssl rand -hex 32`). Vercel otomatis mengirimnya ke cron retensi. |
-| `ANALYTICS_CONSENT_MODE` | | `opt-in` | `opt-in` (tidak merekam sebelum "Izinkan"), `notice` (merekam, pengunjung bisa "Tolak"), `none` (tanpa banner — hanya jika consent dikelola alat lain). |
+| `ANALYTICS_CONSENT_MODE` | | `none` | `none` (tanpa banner, analytics anonim langsung berjalan), `notice` (banner informasi + tombol "Tolak"), `opt-in` (tidak merekam sebelum "Izinkan"). |
 | `ANALYTICS_TZ` | | `Asia/Jakarta` | Zona waktu semua tanggal di dashboard. |
 | `ANALYTICS_RETENTION_DAYS` | | `395` | Data lebih lama dihapus otomatis (min. 30). |
 | `ANALYTICS_EXCLUDE_IPS` | | — | IP kantor/agency dipisah koma; tidak dihitung (IP tidak pernah disimpan). |
@@ -90,7 +90,7 @@ Variabel lama (`DATABASE_URL`, `BETTER_AUTH_SECRET`, …) tidak berubah. Tidak a
 2. Set `CRON_SECRET` (+ opsional lainnya), lalu deploy seperti biasa. `vercel.json` mendaftarkan cron harian 19:30 UTC (02:30 WIB).
 3. **Disarankan:** Vercel › Firewall › tambah *Rate Limit rule* untuk path `/api/collect` (mis. 120 request / 60 detik per IP). Rate limit di kode bersifat per-instance (best effort).
 4. Region fungsi tetap **sin1** (dekat Neon Singapore).
-5. Buka website di browser biasa (tidak login CMS), setujui banner, klik beberapa tombol → dalam ±10 detik data muncul di **CMS › Analytics** (rentang "Hari ini").
+5. Buka website di browser biasa (tidak login CMS), klik beberapa tombol → dalam ±10 detik data muncul di **CMS › Analytics** (rentang "Hari ini").
 
 ### 2.4 Tes
 ```bash
@@ -184,11 +184,11 @@ Waktu tonton = **waktu putar nyata** (dijumlahkan dari kemajuan `currentTime` sa
 ---
 
 ## 5. Privasi
-- **Tanpa cookie**, tanpa fingerprinting. ID visitor & sesi = UUID acak di `localStorage`, hanya dibuat setelah persetujuan (mode opt-in).
+- **Tanpa cookie**, tanpa fingerprinting. ID visitor & sesi = UUID acak di `localStorage` (bukan data pribadi; pada mode `opt-in` baru dibuat setelah persetujuan).
 - **Tidak disimpan:** alamat IP (hanya dipakai sementara di memori untuk rate limit, di-hash), isi input/textarea/form, teks halaman, query string URL & referrer, gerakan mouse mentah, posisi scroll mentah, rekaman layar.
 - Geo = negara/region/kota dari header edge Vercel (perkiraan, bukan GPS).
 - **Do-Not-Track / Global Privacy Control** → tidak ada tracking, tidak ada banner.
-- **Tolak** pada banner → tracking berhenti, ID dihapus dari browser; ditanya ulang setelah 6 bulan. Reset: `?mil_consent=reset`.
+- Mode `notice` / `opt-in` (opsional): **Tolak** pada banner → tracking berhenti, ID dihapus dari browser; ditanya ulang setelah 6 bulan. Reset: `?mil_consent=reset`.
 - Traffic internal: browser yang membuka CMS otomatis dikecualikan; selama login CMS, server membuang request-nya; perangkat lain: `?mil_internal=1` (batalkan: `?mil_internal=0`); kantor: `ANALYTICS_EXCLUDE_IPS`.
 - Retensi otomatis (default 395 hari), hapus manual di tab **Data & Privasi**, termasuk per pengunjung (ID dapat dilihat pengunjung via `milAnalytics.visitorId()` di console).
 - Bot: user agent crawler/headless/monitoring dibuang di server; browser otomatis (`navigator.webdriver`) dilewati tracker.
@@ -214,7 +214,7 @@ Di Postgres 16 lokal yang meniru Neon (owner non-superuser + role `cms_app` tanp
 | 14 | Auth admin | ✅ API tanpa admin → 401/403; RLS: tanpa user / non-admin → 0 baris; `cms_app` tidak bisa INSERT langsung |
 | 15 | Internal traffic | ✅ `?mil_internal=1`, browser CMS, dan request dengan cookie sesi CMS tidak tercatat |
 | 16 | Duplicate prevention | ✅ batch dikirim ulang tidak menggandakan; inisialisasi tracker kedua diabaikan; snapshot lama tidak menurunkan angka; session ID milik visitor lain ditolak |
-| 17 | Privacy & consent | ✅ opt-in: 0 request & tanpa ID sebelum "Izinkan"; "Tolak": 0 request, ID dihapus; DNT: 0 request, tanpa banner |
+| 17 | Privacy & consent | ✅ mode `none`: tanpa banner, langsung merekam; mode opt-in: 0 request & tanpa ID sebelum "Izinkan"; "Tolak": 0 request, ID dihapus; DNT: 0 request |
 | 18 | Performa | ✅ script `defer` + inisialisasi saat idle, listener pasif, 1 request / 10 dtk; tidak mengubah markup/CSS (tes fidelity tetap lolos) |
 | — | Metric | ✅ `npm run test:analytics`: 73/73 assertion (semua metric di atas dihitung dari event uji dengan nilai yang diketahui) |
 
@@ -224,7 +224,7 @@ Di Postgres 16 lokal yang meniru Neon (owner non-superuser + role `cms_app` tanp
 1. Jalankan `db/migrations/002_analytics.sql` di Neon production.
 2. Set `CRON_SECRET` di Vercel (dan opsional `ANALYTICS_*`).
 3. Tambah Vercel Firewall rate-limit rule untuk `/api/collect`.
-4. Putuskan mode consent dengan tim legal (default `opt-in` = paling aman, tetapi hanya pengunjung yang setuju yang terhitung — angka akan lebih rendah dari Google Analytics tanpa consent).
+4. Mode consent: diputuskan `none` (tanpa banner) karena hanya data anonim yang dikumpulkan. Bila kebijakan berubah, set `ANALYTICS_CONSENT_MODE=notice` atau `opt-in` di Vercel lalu redeploy.
 5. Perbarui Kebijakan Privasi website.
 6. Kecualikan perangkat tim yang tidak login CMS (`?mil_internal=1`) dan/atau set `ANALYTICS_EXCLUDE_IPS`.
 

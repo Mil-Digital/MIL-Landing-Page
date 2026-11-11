@@ -13,7 +13,7 @@
 
   /* ------------------------------------------------------------------ config */
   var ENDPOINT = script.getAttribute("data-endpoint") || "/api/collect";
-  var CONSENT_MODE = script.getAttribute("data-consent") || "opt-in"; // opt-in | notice | none
+  var CONSENT_MODE = script.getAttribute("data-consent") || "none"; // none | notice | opt-in
   var LAYOUT = script.getAttribute("data-layout") || "";
   var SESSION_TIMEOUT = 30 * 60 * 1000;
   var FLUSH_MS = 10000;
