@@ -24,6 +24,12 @@ function ShellInner({ children }: { children: ReactNode }) {
   const { admin, changed, confirmLeave } = useCms();
   const [open, setOpen] = useState(false);
   useEffect(() => setOpen(false), [path]);
+  // Browsers used for the CMS are internal traffic: never counted by the website analytics.
+  useEffect(() => {
+    try {
+      if (localStorage.getItem("mil_a_count_me") !== "1") localStorage.setItem("mil_a_internal", "1");
+    } catch { /* storage unavailable */ }
+  }, []);
 
   const guard = (e: MouseEvent) => {
     if (!confirmLeave()) e.preventDefault();
@@ -51,6 +57,7 @@ function ShellInner({ children }: { children: ReactNode }) {
       : path.startsWith("/admin/content/")
         ? SECTIONS.find((s) => path.endsWith("/" + s.id))?.label ?? "Konten"
         : path.startsWith("/admin/media") ? "Media Library"
+        : path.startsWith("/admin/analytics") ? "Analytics"
         : path.startsWith("/admin/history") ? "Riwayat versi"
         : path.startsWith("/admin/devices") ? "Preview responsif"
         : path.startsWith("/admin/account") ? "Akun" : "";
@@ -66,6 +73,7 @@ function ShellInner({ children }: { children: ReactNode }) {
           </div>
         </div>
         {item("/admin", "home", "Dashboard", false, true)}
+        {item("/admin/analytics", "stats", "Analytics")}
         <div className="nav-label">Konten halaman</div>
         {contentSections.map((s) => item(`/admin/content/${s.id}`, s.icon, s.label, changed.has(s.id)))}
         <div className="nav-label">Kelola</div>

@@ -7,6 +7,7 @@ Landing page MIL Digital dengan **Content Studio** (admin CMS) sehingga seluruh 
 - **Stack**: Next.js 16 (Vercel) · **Neon** Postgres + Object Storage · Better Auth (login admin) · RLS di semua tabel CMS.
 
 > Panduan untuk klien (non-teknis): [`docs/PANDUAN-KLIEN.md`](docs/PANDUAN-KLIEN.md)
+> **Analytics, heatmap & video analytics:** [`docs/ANALYTICS.md`](docs/ANALYTICS.md) — setup, definisi metric, privasi, hasil uji.
 
 ---
 
@@ -124,6 +125,7 @@ Fungsi: `get_published_content()`, `publish_site(note)`, `restore_version(n)`, `
       > Jangan membuat role ini lewat Console: role Console otomatis mendapat `neon_superuser` (BYPASSRLS) sehingga RLS tidak berlaku.
    2. `db/migrations/001_schema.sql`
    3. `db/seed.sql`
+   4. `db/migrations/002_analytics.sql` (analytics — lihat `docs/ANALYTICS.md`)
 3. **Connect** → salin connection string **pooled** (host berisi `-pooler`). Buat dua versi:
    - `DATABASE_URL` → ganti user/password menjadi `cms_app` / password langkah 2.1 (untuk website).
    - `DATABASE_URL_OWNER` → versi `neondb_owner` (hanya untuk script lokal).
@@ -149,6 +151,8 @@ Fungsi: `get_published_content()`, `publish_site(note)`, `restore_version(n)`, `
 | `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` | ✅ | ✅ | Kredensial storage |
 | `S3_BUCKET` | ✅ | ✅ | `mil-media` |
 | `SITE_URL` | opsional | ✅ | Untuk canonical & og:image absolut |
+| `CRON_SECRET` | ✅ | — | Cron retensi analytics harian |
+| `ANALYTICS_*` | opsional | opsional | Consent mode, zona waktu, retensi, IP dikecualikan — lihat `docs/ANALYTICS.md` |
 | `DATABASE_URL_OWNER` | ❌ **jangan** | ✅ | Hanya script `admin:create` / `admin:password` |
 
 Tidak ada variabel `NEXT_PUBLIC_*` — tidak ada kredensial yang dikirim ke browser.
@@ -184,6 +188,7 @@ Perubahan konten **tidak memerlukan redeploy**.
 ```bash
 npm run lint             # TypeScript
 npm run test:fidelity    # markup render == HTML original (token per token)
+npm run test:analytics   # metric analytics vs event uji (database uji lokal, lihat docs/ANALYTICS.md)
 npm run build
 ```
 
