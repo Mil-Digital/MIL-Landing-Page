@@ -16,7 +16,7 @@ import type { ImageValue, SiteContent, VideoValue } from "@/content/types";
 import { esc, inline, jsLiteral, plain, safeUrl } from "./format";
 import { HEAD_STYLES, FRAMEWORK_STYLE } from "./generated/styles";
 import { CARD_ICONS, MISC_ICONS, TAG_ICONS, WORKFLOW_ICONS } from "./generated/icons";
-import { FRAMEWORK_SCRIPT, TESTIMONIAL_VIDEO_SCRIPT, WA_FLOAT_SCRIPT, WORKFLOW_CYCLE_SVG } from "./generated/scripts";
+import { FRAMEWORK_SCRIPT, TESTIMONIAL_QUOTES_SCRIPT, TESTIMONIAL_VIDEO_SCRIPT, WA_FLOAT_SCRIPT, WORKFLOW_CYCLE_SVG } from "./generated/scripts";
 import { EXTENSION_STYLES } from "./extensions";
 import { createHash } from "node:crypto";
 import { ANALYTICS, TRACKER_VERSION } from "@/lib/analytics/config";
@@ -43,7 +43,7 @@ const ax = (id: string, label: string, kind?: string) =>
 const sec = (id: string) => ` data-analytics-section="${id}"`;
 
 /** Layout version = template version + hash of the published content. Heatmaps can be limited to one layout. */
-export const TEMPLATE_VERSION = "t1";
+export const TEMPLATE_VERSION = "t2";
 export const layoutVersion = (c: SiteContent) =>
   `${TEMPLATE_VERSION}-${createHash("sha1").update(JSON.stringify(c)).digest("hex").slice(0, 10)}`;
 
@@ -97,6 +97,12 @@ function ctaAttrs(custom: unknown, settings: Any) {
   const external = /^https?:/i.test(url);
   return `href="${esc(url)}" data-wa${external ? ` target="_blank" rel="noopener"` : ""}`;
 }
+
+/** A URL for use inside CSS url(...) in a style attribute: characters that could end the token are percent-encoded. */
+const cssUrl = (u: string) => esc(u.replace(/[()'"\\\s]/g, (ch) => "%" + ch.charCodeAt(0).toString(16).padStart(2, "0").toUpperCase()));
+
+/** Quote text without surrounding quotation marks (they are added by the template). */
+const unquote = (v: unknown) => String(v ?? "").trim().replace(/^["“”„]+|["“”]+$/g, "").trim();
 
 const absolute = (u: string, origin?: string) => (u.startsWith("/") && !u.startsWith("//") && origin ? origin + u : u);
 
@@ -283,6 +289,18 @@ ${addCards}
       return `      <div class="t-card t-video"><div class="tv-cap">${esc(t.caption)}</div><div class="tv-frame" data-analytics-video="testimonial-${i + 1}"><button type="button" class="tv-play" aria-label="${esc(testi.playLabel)}"${ax(`testimonials.play-${i + 1}`, `Testimonial — ${plain(t.caption) || `Video ${i + 1}`} (Play)`, "video")}>${MISC_ICONS.play}${MISC_ICONS.replay}</button><video src="${esc(safeUrl(v!.url))}" playsinline preload="none" controlslist="nodownload" disablepictureinpicture${poster ? ` poster="${esc(poster)}"` : ""} aria-label="${esc(t.ariaLabel || t.caption)}">${esc(testi.unsupportedText)}</video></div></div>`;
     })
     .join("\n");
+  const quotes = (testi.quotes ?? [])
+    .filter((q: Any) => unquote(q?.quote) && safeUrl(q?.background?.url))
+    .map((q: Any) => {
+      const name = String(q.name ?? "").trim(), role = String(q.role ?? "").trim();
+      const logo = img(q.logo, { cls: q.logoShape === "square" ? "sq" : undefined, lazy: true });
+      return `<figure class="tq-card" style="--bg:url(${cssUrl(safeUrl(q.background.url))})"><blockquote>“${esc(unquote(q.quote))}”</blockquote><figcaption>${logo}<span>${name ? `<b>${esc(name)}</b>` : ""}${esc(role)}</span></figcaption></figure>`;
+    })
+    .join("");
+  const quotesHtml = quotes
+    ? `
+  <div class="tq-wrap" aria-label="${esc(testi.quotesLabel)}"><div class="tq-track" tabindex="0"${ax("testimonials.quotes", "Testimonial — Carousel kutipan", "carousel")}><div class="tq-set">${quotes}</div></div></div>`
+    : "";
   const testiHtml = `
 <!-- ================= TESTIMONIALS ================= -->
 <section class="sec testi"${sec("testimonials")}>
@@ -290,7 +308,7 @@ ${addCards}
     <div class="head"><h2 class="display">${inline(testi.headline)}</h2></div>
     <div class="testi-grid">
 ${cards}
-    </div>
+    </div>${quotesHtml}
   </div>
 </section>`;
 
@@ -354,7 +372,7 @@ ${cards}
 
 <a href="${esc(waLink(set))}" data-wa target="_blank" rel="noopener" class="wa-float" aria-label="${esc(set.waFloatLabel)}"${ax("whatsapp.float", "WhatsApp — tombol melayang", "whatsapp")}>${MISC_ICONS.whatsapp}</a>
 <script>${WA_FLOAT_SCRIPT}</script>
-<script id="tv-js">${tvScript}</script>${tracker}${opts.preview ? `
+<script id="tv-js">${tvScript}</script>${quotes ? `<script id="tq-js">${TESTIMONIAL_QUOTES_SCRIPT}</script>` : ""}${tracker}${opts.preview ? `
 <div style="position:fixed;left:16px;bottom:16px;z-index:9999;font:600 12px/1 system-ui,sans-serif;background:#111827;color:#fff;padding:9px 12px;border-radius:999px;box-shadow:0 6px 20px rgba(0,0,0,.25);letter-spacing:.02em">● PREVIEW — konten draft, belum dipublikasikan</div>` : ""}`;
 
   return `${head}\n\n<body>\n${heroHtml}\n${clientsHtml}\n${workflowHtml}\n${servicesHtml}\n${testiHtml}\n${ctaHtml}\n${footerHtml}${tail}</body>\n</html>\n`;

@@ -275,7 +275,7 @@ export const SECTIONS: SectionDef[] = [
     id: "testimonials",
     label: "Testimonials",
     icon: "video",
-    description: "Video testimoni klien. Urutan kartu sama dengan urutan di halaman.",
+    description: "Video testimoni klien dan carousel kutipan testimoni. Urutan kartu sama dengan urutan di halaman.",
     groups: [
       {
         title: "Judul",
@@ -309,6 +309,39 @@ export const SECTIONS: SectionDef[] = [
               { key: "ariaLabel", type: "text", label: "Deskripsi video (aksesibilitas)", showIf: { field: "kind", equals: "video" } },
             ],
           },
+        ],
+      },
+      {
+        title: "Testimoni teks (carousel)",
+        description:
+          "Kartu kutipan yang bergeser otomatis di bawah video. Pengunjung dapat menggeser (drag / scroll) dan carousel berhenti saat kursor di atasnya. Kosongkan daftar untuk menyembunyikan carousel.",
+        fields: [
+          {
+            key: "quotes",
+            type: "repeater",
+            label: "Daftar kutipan",
+            itemLabel: "Kutipan",
+            titleKey: "name",
+            max: 12,
+            newItem: { quote: "", name: "", role: "", background: { url: "" }, logo: { url: "", alt: "" }, logoShape: "round" },
+            fields: [
+              { key: "quote", type: "textarea", label: "Isi testimoni", rows: 4, required: true, maxLength: 320, help: "Tanda kutip “ ” ditambahkan otomatis. Idealnya 150–250 karakter agar muat di kartu." },
+              { key: "name", type: "text", label: "Nama (tebal)", required: true, help: "Contoh: Maggie, atau @valentinedecor (Wedding Decoration)" },
+              { key: "role", type: "text", label: "Jabatan / brand", help: "Contoh: Owner of @crabus.id (Fashion Retail). Boleh dikosongkan." },
+              { key: "background", type: "image", label: "Foto latar kartu", required: true, help: "Foto lebar ±1400×375 px (rasio ±3,7:1). Bagian bawah otomatis digelapkan agar teks terbaca." },
+              { key: "logo", type: "image", label: "Logo brand", withAlt: true, help: "Logo kecil di samping nama. Persegi, min. 96×96 px." },
+              {
+                key: "logoShape",
+                type: "select",
+                label: "Bentuk logo",
+                options: [
+                  { value: "round", label: "Bulat" },
+                  { value: "square", label: "Kotak" },
+                ],
+              },
+            ],
+          },
+          { key: "quotesLabel", type: "text", label: "Label carousel (aksesibilitas)" },
         ],
       },
       {
@@ -461,7 +494,7 @@ export const DEFAULT_CONTENT: SiteContent = {
   hero: {
     logo: { url: "/assets/logo-mil.png", alt: "MIL Digital — Digital Marketing Consultant", width: 787, height: 168 },
     tagline: "Strategic Thinking Partner",
-    background: { url: "/assets/hero-bg.jpg", alt: "", width: 1500, height: 1000 },
+    background: { url: "/assets/hero-bg.jpg", alt: "", width: 2576, height: 1717 },
     headlineLine1: "Biaya iklan naik,",
     headlineLine2: "tapi *hasilnya* gak ikut naik?",
     description:
@@ -624,8 +657,37 @@ export const DEFAULT_CONTENT: SiteContent = {
         poster: { url: "/assets/testi-lyla-poster.jpg", width: 540, height: 960 },
         ariaLabel: "Video testimoni Lyla",
       },
-      { kind: "placeholder", caption: "Testimonial 3", video: { url: "" }, poster: { url: "" }, ariaLabel: "" },
     ],
+    quotes: [
+      {
+        quote:
+          "Bareng MIL, kami tidak lagi perlu khawatir untuk menentukan langkah bisnis karena setiap keputusan didukung data. Ditambah layanan yang konsisten dan selalu memberikan value bagi bisnis kami.",
+        name: "Maggie",
+        role: "Owner of @crabus.id (Fashion Retail)",
+        background: { url: "/assets/testi-quote-crabus-bg.jpg", alt: "", width: 1400, height: 368 },
+        logo: { url: "/assets/testi-quote-crabus-logo.png", alt: "Logo Crabus", width: 192, height: 192 },
+        logoShape: "round",
+      },
+      {
+        quote:
+          "MIL has helped us strengthen our brand visibility and improve our marketing and sales efforts. Their supportive and proactive team has made our collaboration truly valuable.",
+        name: "Patricia",
+        role: "Owner of @petitefleur_jkt (Florist)",
+        background: { url: "/assets/testi-quote-petitefleur-bg.jpg", alt: "", width: 1400, height: 375 },
+        logo: { url: "/assets/testi-quote-petitefleur-logo.png", alt: "Logo Petite Fleur", width: 220, height: 200 },
+        logoShape: "square",
+      },
+      {
+        quote:
+          "MIL membuat strategi digital marketing kami jadi lebih terarah. Kami juga melihat perkembangan positif pada engagement dan followers Instagram, didukung oleh komunikasi serta arahan tim MIL yang responsif.",
+        name: "@valentinedecor (Wedding Decoration)",
+        role: "",
+        background: { url: "/assets/testi-quote-valentine-bg.jpg", alt: "", width: 1400, height: 375 },
+        logo: { url: "/assets/testi-quote-valentine-logo.png", alt: "Logo Valentine Decor", width: 192, height: 192 },
+        logoShape: "round",
+      },
+    ],
+    quotesLabel: "Testimoni klien lainnya",
     playLabel: "Putar video testimoni",
     replayLabel: "Putar ulang video testimoni",
     unsupportedText: "Browser kamu tidak mendukung pemutaran video.",
@@ -659,7 +721,7 @@ export const DEFAULT_CONTENT: SiteContent = {
     metaTitle: "MIL Digital — Strategic Thinking Partner",
     metaDescription:
       "MIL Digital: Strategic Thinking Partner untuk business growth dan more profit lewat strategi, data, kreatif, dan ads optimization.",
-    ogImage: { url: "/assets/hero-bg.jpg", alt: "", width: 1500, height: 1000 },
+    ogImage: { url: "/assets/hero-bg.jpg", alt: "", width: 2576, height: 1717 },
     favicon: { url: "" },
     waNumber: "6281234567890",
     waMessage: "Halo MIL Digital, saya ingin diskusi soal growth dan efisiensi marketing bisnis saya.",

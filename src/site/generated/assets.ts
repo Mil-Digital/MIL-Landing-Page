@@ -46,9 +46,9 @@ export const BUNDLED_ASSETS: Record<string, { width?: number; height?: number; s
     "size": 471063
   },
   "/assets/hero-bg.jpg": {
-    "width": 1500,
-    "height": 1000,
-    "size": 336395
+    "width": 2576,
+    "height": 1717,
+    "size": 498357
   },
   "/assets/logo-mil.png": {
     "width": 787,
@@ -61,7 +61,37 @@ export const BUNDLED_ASSETS: Record<string, { width?: number; height?: number; s
     "size": 63024
   },
   "/assets/testi-lyla.mp4": {
-    "size": 6931546
+    "size": 7457572
+  },
+  "/assets/testi-quote-crabus-bg.jpg": {
+    "width": 1400,
+    "height": 368,
+    "size": 45115
+  },
+  "/assets/testi-quote-crabus-logo.png": {
+    "width": 192,
+    "height": 192,
+    "size": 17682
+  },
+  "/assets/testi-quote-petitefleur-bg.jpg": {
+    "width": 1400,
+    "height": 375,
+    "size": 58746
+  },
+  "/assets/testi-quote-petitefleur-logo.png": {
+    "width": 220,
+    "height": 200,
+    "size": 16983
+  },
+  "/assets/testi-quote-valentine-bg.jpg": {
+    "width": 1400,
+    "height": 375,
+    "size": 50322
+  },
+  "/assets/testi-quote-valentine-logo.png": {
+    "width": 192,
+    "height": 192,
+    "size": 20661
   },
   "/assets/testi-wheels-poster.jpg": {
     "width": 540,
@@ -69,6 +99,6 @@ export const BUNDLED_ASSETS: Record<string, { width?: number; height?: number; s
     "size": 105424
   },
   "/assets/testi-wheels.mp4": {
-    "size": 7592603
+    "size": 7570851
   }
 };
