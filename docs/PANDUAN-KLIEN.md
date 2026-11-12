@@ -59,6 +59,8 @@ Untuk daftar berulang (testimoni, kartu layanan, tag, logo klien, statistik, lin
 
 Testimoni: pilih jenis **Video testimoni**, isi nama klien (mis. @namabrand), upload **Video** dan **Thumbnail/poster** (gambar sebelum video diputar). Keduanya bisa diganti terpisah.
 
+Testimoni teks (carousel di bawah video): di **Testimonials › Testimoni teks (carousel)**, tiap kutipan berisi **Isi testimoni** (tanpa tanda kutip — ditambahkan otomatis), **Nama**, **Jabatan / brand**, **Foto latar** (foto lebar ±1400×375 px) dan **Logo brand** (pilih bentuk bulat atau kotak). Carousel bergeser otomatis dan berhenti saat kursor di atasnya. Kosongkan daftar untuk menyembunyikan carousel.
+
 ## 6. SEO & Settings
 - **Meta title & description**: judul dan ringkasan yang tampil di Google.
 - **Gambar share**: gambar yang muncul saat link dibagikan di WhatsApp/LinkedIn (ideal 1200×630 px).

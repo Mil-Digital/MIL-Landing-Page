@@ -260,8 +260,9 @@
     <div class="testi-grid">
       <div class="t-card t-video"><div class="tv-cap">@wheelscoffeeroasters</div><div class="tv-frame"><button type="button" class="tv-play" aria-label="Putar video testimoni"><svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12.5-7.5z"/></svg><svg class="i-replay" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4.5 3.5v3.7h3.7"/></svg></button><video data-vid="wheels" playsinline preload="metadata" controlslist="nodownload" disablepictureinpicture poster="/assets/testi-wheels-poster.jpg" aria-label="Video testimoni Wheels">Browser kamu tidak mendukung pemutaran video.</video></div></div>
       <div class="t-card t-video"><div class="tv-cap">@lyla.officielle</div><div class="tv-frame"><button type="button" class="tv-play" aria-label="Putar video testimoni"><svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12.5-7.5z"/></svg><svg class="i-replay" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4.5 3.5v3.7h3.7"/></svg></button><video data-vid="lyla" playsinline preload="metadata" controlslist="nodownload" disablepictureinpicture poster="/assets/testi-lyla-poster.jpg" aria-label="Video testimoni Lyla">Browser kamu tidak mendukung pemutaran video.</video></div></div>
-      <div class="t-card"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Testimonial 3</div>
+      
     </div>
+  <div class="tq-wrap" aria-label="Testimoni klien lainnya"><div class="tq-track" tabindex="0"><div class="tq-set"><figure class="tq-card" style="--bg:url(/assets/testi-quote-crabus-bg.jpg)"><blockquote>“Bareng MIL, kami tidak lagi perlu khawatir untuk menentukan langkah bisnis karena setiap keputusan didukung data. Ditambah layanan yang konsisten dan selalu memberikan value bagi bisnis kami.”</blockquote><figcaption><img src="/assets/testi-quote-crabus-logo.png" alt="Logo Crabus"><span><b>Maggie</b>Owner of @crabus.id (Fashion Retail)</span></figcaption></figure><figure class="tq-card" style="--bg:url(/assets/testi-quote-petitefleur-bg.jpg)"><blockquote>“MIL has helped us strengthen our brand visibility and improve our marketing and sales efforts. Their supportive and proactive team has made our collaboration truly valuable.”</blockquote><figcaption><img class="sq" src="/assets/testi-quote-petitefleur-logo.png" alt="Logo Petite Fleur"><span><b>Patricia</b>Owner of @petitefleur_jkt (Florist)</span></figcaption></figure><figure class="tq-card" style="--bg:url(/assets/testi-quote-valentine-bg.jpg)"><blockquote>“MIL membuat strategi digital marketing kami jadi lebih terarah. Kami juga melihat perkembangan positif pada engagement dan followers Instagram, didukung oleh komunikasi serta arahan tim MIL yang responsif.”</blockquote><figcaption><img src="/assets/testi-quote-valentine-logo.png" alt="Logo Valentine Decor"><span><b>@valentinedecor (Wedding Decoration)</b></span></figcaption></figure></div></div></div>
   </div>
 </section>
 
@@ -315,4 +316,36 @@ document.querySelectorAll("a[data-wa]").forEach(function(a){
 })();
 </script>
 
-<script>(function(){[].forEach.call(document.querySelectorAll(".t-video video[data-vid]"),function(v){var el=document.getElementById("tv-data-"+v.getAttribute("data-vid"));if(!el)return;try{var bin=atob(el.textContent),n=bin.length,u=new Uint8Array(n);for(var i=0;i<n;i++)u[i]=bin.charCodeAt(i);v.src=URL.createObjectURL(new Blob([u],{type:"video/mp4"}));v.load();}catch(e){}});})();</script><script id="tv-js">(function(){var frames=[].slice.call(document.querySelectorAll(".t-video .tv-frame"));frames.forEach(function(f){var v=f.querySelector("video"),b=f.querySelector(".tv-play");if(!v||!b)return;function play(){frames.forEach(function(o){var ov=o.querySelector("video");if(ov&&ov!==v&&!ov.paused)ov.pause();});if(f.classList.contains("is-ended")){v.currentTime=0}f.classList.remove("is-ended");var p=v.play();if(p&&p.catch)p.catch(function(){})}b.addEventListener("click",play);v.addEventListener("click",function(){if(v.paused||v.ended)play();else v.pause()});v.addEventListener("play",function(){f.classList.add("is-playing");f.classList.remove("is-ended");b.setAttribute("aria-label","Putar video testimoni")});v.addEventListener("pause",function(){if(!v.ended)f.classList.remove("is-playing")});v.addEventListener("ended",function(){f.classList.remove("is-playing");f.classList.add("is-ended");b.setAttribute("aria-label","Putar ulang video testimoni")});});})();</script>
+<script>(function(){[].forEach.call(document.querySelectorAll(".t-video video[data-vid]"),function(v){var el=document.getElementById("tv-data-"+v.getAttribute("data-vid"));if(!el)return;try{var bin=atob(el.textContent),n=bin.length,u=new Uint8Array(n);for(var i=0;i<n;i++)u[i]=bin.charCodeAt(i);v.src=URL.createObjectURL(new Blob([u],{type:"video/mp4"}));v.load();}catch(e){}});})();</script><script id="tv-js">(function(){var frames=[].slice.call(document.querySelectorAll(".t-video .tv-frame"));frames.forEach(function(f){var v=f.querySelector("video"),b=f.querySelector(".tv-play");if(!v||!b)return;function play(){frames.forEach(function(o){var ov=o.querySelector("video");if(ov&&ov!==v&&!ov.paused)ov.pause();});if(f.classList.contains("is-ended")){v.currentTime=0}f.classList.remove("is-ended");var p=v.play();if(p&&p.catch)p.catch(function(){})}b.addEventListener("click",play);v.addEventListener("click",function(){if(v.paused||v.ended)play();else v.pause()});v.addEventListener("play",function(){f.classList.add("is-playing");f.classList.remove("is-ended");b.setAttribute("aria-label","Putar video testimoni")});v.addEventListener("pause",function(){if(!v.ended)f.classList.remove("is-playing")});v.addEventListener("ended",function(){f.classList.remove("is-playing");f.classList.add("is-ended");b.setAttribute("aria-label","Putar ulang video testimoni")});});})();</script><script id="tq-js">(function(){var t=document.querySelector(".tq-track");if(!t)return;
+var rail=document.createElement("div");rail.className="tq-rail";while(t.firstChild)rail.appendChild(t.firstChild);t.appendChild(rail);
+var set=rail.querySelector(".tq-set");
+function gap(){return parseFloat(getComputedStyle(rail).columnGap)||20}
+function period(){return set.offsetWidth+gap()}
+function fill(){while(rail.scrollWidth<t.clientWidth+period()*1.2){rail.appendChild(set.cloneNode(true)).setAttribute("aria-hidden","true")}}
+fill();
+var reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+var x=0,visible=false,started=false,startT=0,hover=false,drag=false,holdUntil=0,last=null,speed=14; /* px per detik */
+var px=0,vx=0,lastMoveT=0;
+function wrap(){var p=period();x=((x%p)+p)%p}
+function render(){rail.style.transform="translate3d("+(-x)+"px,0,0)"}
+function hold(ms){holdUntil=performance.now()+(ms||2000)}
+if("IntersectionObserver" in window){new IntersectionObserver(function(es){visible=es[0].isIntersecting;
+ if(visible&&!started){clearTimeout(startT);startT=setTimeout(function(){if(visible)started=true},2200)}
+ if(!visible)clearTimeout(startT)},{threshold:.6}).observe(t)}else{visible=started=true}
+var cur=0;
+function step(ts){if(last===null)last=ts;var dt=Math.min(ts-last,60)/1000;last=ts;
+ var target=(started&&visible&&!hover&&!drag&&!reduce&&ts>holdUntil)?speed:0;
+ cur+= (target-cur)*Math.min(1,dt*3);          /* percepatan halus, tidak langsung patah */
+ if(!drag){x+=cur*dt+vx*dt; vx*=Math.pow(0.04,dt); if(Math.abs(vx)<1)vx=0}
+ wrap();render();requestAnimationFrame(step)}
+requestAnimationFrame(step);
+t.addEventListener("mouseenter",function(){hover=true});
+t.addEventListener("mouseleave",function(){hover=false});
+t.addEventListener("pointerdown",function(e){drag=true;px=e.clientX;vx=0;lastMoveT=performance.now();t.classList.add("dragging");try{t.setPointerCapture(e.pointerId)}catch(_){}});
+t.addEventListener("pointermove",function(e){if(!drag)return;var dx=e.clientX-px,now=performance.now();px=e.clientX;x-=dx;var d=Math.max(now-lastMoveT,1);vx=-dx/d*1000;lastMoveT=now;wrap();render()});
+function up(){if(!drag)return;drag=false;t.classList.remove("dragging");if(performance.now()-lastMoveT>80)vx=0;vx=Math.max(-1800,Math.min(1800,vx));hold(2500)}
+t.addEventListener("pointerup",up);t.addEventListener("pointercancel",up);
+t.addEventListener("wheel",function(e){var d=Math.abs(e.deltaX)>Math.abs(e.deltaY)?e.deltaX:(e.shiftKey?e.deltaY:0);if(!d)return;e.preventDefault();x+=d;wrap();render();hold(2000)},{passive:false});
+t.addEventListener("keydown",function(e){if(e.key==="ArrowRight"||e.key==="ArrowLeft"){vx=e.key==="ArrowRight"?900:-900;hold(3000)}});
+t.addEventListener("dragstart",function(e){e.preventDefault()});
+window.addEventListener("resize",function(){fill();wrap();render()});})();</script>

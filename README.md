@@ -47,7 +47,8 @@ Admin ──► /admin/* (proxy.ts: wajib cookie sesi) ──► React UI
 | Temuan | Tindakan |
 |---|---|
 | File 24 MB, 97% berupa Base64 | Semua asset diekstrak menjadi file → HTML kini ±77 KB |
-| 2 video testimoni (7,6 MB + 6,9 MB) di `<script type="text/plain">` + di-decode ke Blob di browser | File MP4 biasa, `preload="none"` + poster; dapat dipindah ke Neon Object Storage |
+| 2 video testimoni (7,6 MB + 7,5 MB) di `<script type="text/plain">` + di-decode ke Blob di browser | File MP4 biasa, `preload="none"` + poster; dapat dipindah ke Neon Object Storage |
+| Carousel testimoni teks (`.tq-card`, 3 kartu, foto latar + logo Base64) | Foto & logo jadi file di `/public/assets/testi-quote-*`; kartu dikelola di CMS › Testimonials › *Testimoni teks*; script `tq-js` disalin verbatim (tidak dimuat bila carousel kosong) |
 | 3 font SF Pro Display OTF (Base64) | `/public/fonts`, cache 1 tahun, `preload` untuk 400 & 700 (tanpa flash) |
 | 2 gambar logo wall PNG (±480 KB) | WebP **lossless** (piksel identik, ±275 KB) |
 | 2 gambar `.lp-stack` | Tersembunyi di semua breakpoint (`display:none`) → dihapus |
@@ -126,6 +127,7 @@ Fungsi: `get_published_content()`, `publish_site(note)`, `restore_version(n)`, `
    2. `db/migrations/001_schema.sql`
    3. `db/seed.sql`
    4. `db/migrations/002_analytics.sql` (analytics — lihat `docs/ANALYTICS.md`)
+   5. `db/migrations/003_testimonial_quotes.sql` — **hanya untuk database yang sudah berjalan sebelum update Nov 2026** (carousel testimoni teks). Database baru tidak perlu: isinya sudah ada di `seed.sql`.
 3. **Connect** → salin connection string **pooled** (host berisi `-pooler`). Buat dua versi:
    - `DATABASE_URL` → ganti user/password menjadi `cms_app` / password langkah 2.1 (untuk website).
    - `DATABASE_URL_OWNER` → versi `neondb_owner` (hanya untuk script lokal).
